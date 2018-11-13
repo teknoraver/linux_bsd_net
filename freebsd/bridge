@@ -1,0 +1,7 @@
+#!/bin/sh
+
+ifconfig vtnet0 down
+ifconfig bridge create
+ifconfig bridge0 addm ix0 addm ix1 up
+ifconfig ix0 up
+ifconfig ix1 up

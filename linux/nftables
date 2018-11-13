@@ -1,0 +1,11 @@
+#!/bin/sh
+
+./rt
+
+nft delete table firewall 2>/dev/null
+nft add table ip firewall
+nft add chain ip firewall forward { type filter hook forward priority 0 \; }
+
+for i in $(seq 1001 $((1000 + $1))); do
+	nft add rule ip firewall forward tcp dport $i drop
+done

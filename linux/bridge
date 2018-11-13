@@ -1,0 +1,12 @@
+#!/bin/sh
+
+[ -d /sys/class/net/br0 ] && ip link del dev br0
+
+exec ip -b - <<'EOF'
+link add name br0 type bridge
+link set dev ens9 master br0
+link set dev ens10 master br0
+link set dev ens9 up
+link set dev ens10 up
+link set dev br0 up
+EOF

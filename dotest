@@ -1,0 +1,5 @@
+#!/bin/sh
+
+unbuffer sudo ./t-rex-64 -f mymix.yaml --nc -d ${1-100} -c 14 -m 14  |
+	awk '/(Cpu Utilization|Total-Tx|Total-Rx|Total-PPS|drop-rate)/{print}/current time/{time=$4;print}/Total-rx-pkt/{pkt=$3;print}END{printf("###############\nRX Kpps: %.f\n",pkt/time/1000)}'
+

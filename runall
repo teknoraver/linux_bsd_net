@@ -1,0 +1,45 @@
+#!/bin/bash
+
+hv=root@hv
+trex=test@trex
+
+oses='fedora freebsd'
+num='1 2 4 8'
+
+dotest() {
+	# reboot the VM to rehash the NIC queues
+	local os=$1 cpu=$2 test=$3
+	ssh -q $hv "echo '$test' >test ; virsh -q start $os$cpu"
+	sleep 30
+	ssh -q $trex 'cd trex; ./dotest 60 1'
+	ssh -q $hv "virsh -q shutdown $os$cpu ; while virsh list --name |grep -q $os$cpu; do sleep .5; done"
+}
+
+dotests() {
+	local test=$1 os cpu
+	for os in $oses; do
+		for cpu in $num; do
+			echo -n "$os$cpu"
+			for i in {1..10}; do
+				dotest $os $cpu "$test"
+			done 2>/dev/null
+			echo
+		done
+	done
+}
+
+ssh -q $trex 'sudo cp trex/bridged.yaml /etc/trex_cfg.yaml'
+echo bridge
+dotests ./br
+
+# don't forget gateway_enable="YES" on FreeBSD
+ssh -q $trex 'sudo cp trex/routed.yaml /etc/trex_cfg.yaml'
+echo routing
+dotests ./rt
+
+
+# don't forget {pf,firewall}_enable="YES" on FreeBSD
+for fw in 1 10 100 1000; do
+	echo "fw $fw"
+	dotests "./fw $fw"
+done

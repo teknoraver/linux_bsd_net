@@ -1,0 +1,12 @@
+#!/bin/sh
+
+./rt
+
+pf=/tmp/pf-$$.conf
+
+for i in $(seq 1001 $((1000 + $1))); do
+	echo "block drop in proto udp to any port $i"
+done >$pf
+
+pfctl -F all -f $pf
+rm -f $pf

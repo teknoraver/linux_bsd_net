@@ -1,0 +1,12 @@
+#!/bin/sh
+
+./rt
+
+ipfw -q -f flush
+cmd='ipfw add'
+
+for i in $(seq 1001 $((1000 + $1))); do
+	$cmd $i deny tcp from any to any dst-port $i
+done
+
+$cmd 10000 allow ip from any to any

@@ -1,0 +1,9 @@
+#!/bin/sh
+
+./rt
+
+iptables -F
+
+for i in $(seq 1001 $((1000 + $1))); do
+	iptables -A FORWARD -p tcp --dport $i -j DROP
+done
