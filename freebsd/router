@@ -1,6 +1,13 @@
-#!/bin/sh
+#!/usr/local/bin/bash
 
 ifconfig ix0 16.1.0.1/8
 ifconfig ix1 20.1.0.1/8
 route add -net 48.0.0.0/8 20.1.0.2
 arp -s 20.1.0.2 24:6e:96:63:81:aa
+for i in dev.ix.{0,1}.fc; do
+	while [ "$(sysctl -n $i)" -ne 3 ]; do
+		sleep .1
+	done
+	sysctl -w $i=0
+done
+sysctl -w net.inet.ip.forwarding=1
