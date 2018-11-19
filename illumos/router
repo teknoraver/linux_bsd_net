@@ -1,0 +1,14 @@
+#!/usr/bin/bash
+
+svcadm disable svc:/network/physical:nwam
+svcadm enable svc:/network/physical:default
+svcadm disable network/ipfilter
+ipf -Fa
+ipf -Fi
+ipf -Fo
+ipadm create-addr -T static -a 16.1.0.1/8 ixgbe0/v4static
+ipadm create-addr -T static -a 20.1.0.1/8 ixgbe1/v4static
+arp -s 20.1.0.2 24:6e:96:63:81:aa
+route -p add 48.0.0.0 -netmask 255.0.0.0 20.1.0.2
+ifconfig ixgbe0 router
+ifconfig ixgbe1 router
